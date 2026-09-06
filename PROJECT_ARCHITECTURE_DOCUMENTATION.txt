@@ -1,0 +1,222 @@
+====================================================================================================
+               PROJECT ARCHITECTURE & TECHNICAL REFERENCE DOCUMENTATION
+                    STUDENT TASK MANAGEMENT SYSTEM (TASKPULSE)
+                       REACT 19 + SPRING BOOT 3.2 + AIVEN MYSQL
+====================================================================================================
+
+DOCUMENT OVERVIEW:
+This document provides an exhaustive, production-grade technical breakdown of the Student Task
+Management System. It serves as a complete reference for resume preparation, system design interviews,
+and technical code walkthroughs.
+
+----------------------------------------------------------------------------------------------------
+TABLE OF CONTENTS
+----------------------------------------------------------------------------------------------------
+1. SYSTEM ARCHITECTURE & N-TIER DESIGN
+2. DATABASE STRUCTURE & ENTITY-RELATIONSHIP (ER) MODEL
+3. AUTHENTICATION & AUTHORIZATION COMPLETE FLOW
+4. DUAL-LAYER VALIDATION MECHANISM
+5. BACKEND JAVA CLASSES: ROLE, RATIONALE & EXECUTION LIFECYCLE
+6. FRONTEND REACT COMPONENTS: ROLE & COMPONENT HIERARCHY
+7. DEPLOYMENT CONFIGURATION (RENDER + VERCEL)
+
+====================================================================================================
+1. SYSTEM ARCHITECTURE & N-TIER DESIGN
+====================================================================================================
+
+The application is engineered using a decoupled, N-Tier Client-Server Architecture:
+
+[ React 19 SPA (Vercel) ] <== HTTPS / REST APIs / JSON ==> [ Spring Boot 3.2 Backend (Render) ]
+                                                                      ||
+                                                                      \/
+                                                          [ Aiven Cloud MySQL 8.0 ]
+
+Layer Breakdown:
+- Presentation Layer (Frontend): React 19 single-page application built with Vite, Tailwind CSS,
+  Framer Motion, and Axios. Features reactive state management and route protection.
+- API Controller Layer: Spring REST Controllers consuming/producing JSON DTO payloads validated by
+  Jakarta Validation annotations.
+- Service Business Logic Layer: Transactional `@Service` components encapsulating domain workflows.
+- Security & Interceptor Layer: Spring Security 6 Filter Chain with JJWT Access Tokens and Stateful
+  Session DB validation (`UserSessionRepository`).
+- Data Access Layer (Repository): Spring Data JPA interface implementations backed by Hibernate.
+- Database Layer: Aiven Cloud MySQL 8.0 relational schema with foreign key integrity and indexes.
+
+====================================================================================================
+2. DATABASE STRUCTURE & ENTITY-RELATIONSHIP (ER) MODEL
+====================================================================================================
+
+Database Name: student_task_db (Hosted on Aiven Cloud MySQL)
+
+TABLE 1: `users`
+- `id` (BIGINT, PK, AUTO_INCREMENT): Unique user primary key.
+- `name` (VARCHAR(100), NOT NULL): Full name of student/instructor.
+- `email` (VARCHAR(150), NOT NULL, UNIQUE): Unique login email address.
+- `password` (VARCHAR(255), NOT NULL): BCrypt encrypted password hash.
+- `role` (VARCHAR(20), NOT NULL): System role ('ROLE_STUDENT', 'ROLE_INSTRUCTOR', 'ROLE_ADMIN').
+- `auth_provider` (VARCHAR(20), NOT NULL): Provider ('LOCAL', 'GOOGLE').
+- `avatar_url` (VARCHAR(255)): URL to user profile avatar icon.
+- `department` (VARCHAR(100)): Student branch/major (e.g. Computer Science).
+- `created_at` (DATETIME, NOT NULL): User registration timestamp.
+
+TABLE 2: `refresh_tokens`
+- `id` (BIGINT, PK, AUTO_INCREMENT): Token identifier.
+- `user_id` (BIGINT, FK -> users.id, UNIQUE): One-to-one mapping with user.
+- `token` (VARCHAR(255), NOT NULL, UNIQUE): Cryptographic UUID refresh token string.
+- `expiry_date` (DATETIME, NOT NULL): Expiration timestamp (7 days).
+- `revoked` (BOOLEAN, NOT NULL): Revocation flag.
+
+TABLE 3: `user_sessions`
+- `id` (BIGINT, PK, AUTO_INCREMENT): Session ID.
+- `user_id` (BIGINT, FK -> users.id): Reference to authenticated user.
+- `session_id` (VARCHAR(100), NOT NULL, UNIQUE): UUID claim embedded in JWT access token.
+- `device_info` (VARCHAR(255)): User-Agent browser/OS metadata.
+- `ip_address` (VARCHAR(50)): Remote client IP address.
+- `last_active` (DATETIME, NOT NULL): Timestamp updated on every authenticated HTTP request.
+- `created_at` (DATETIME, NOT NULL): Initial login timestamp.
+- `revoked` (BOOLEAN, NOT NULL): Flag for remote session termination.
+
+TABLE 4: `courses`
+- `id` (BIGINT, PK, AUTO_INCREMENT): Course identifier.
+- `code` (VARCHAR(20), NOT NULL): Academic course code (e.g., CS101, DS202).
+- `title` (VARCHAR(150), NOT NULL): Full course name.
+- `instructor_name` (VARCHAR(100)): Course instructor name.
+- `color_code` (VARCHAR(10)): HEX color badge code for UI tagging.
+- `user_id` (BIGINT, FK -> users.id): User ownership.
+
+TABLE 5: `tasks`
+- `id` (BIGINT, PK, AUTO_INCREMENT): Task identifier.
+- `title` (VARCHAR(180), NOT NULL): Academic task title.
+- `description` (TEXT): Detailed context or links.
+- `priority` (VARCHAR(20)): 'LOW', 'MEDIUM', 'HIGH', 'URGENT'.
+- `status` (VARCHAR(20)): 'TODO', 'IN_PROGRESS', 'COMPLETED'.
+- `category` (VARCHAR(30)): 'ASSIGNMENT', 'PROJECT', 'EXAM_PREP', 'LAB', 'PERSONAL'.
+- `due_date` (DATE): Target completion deadline date.
+- `estimated_hours` (DOUBLE): Estimated study execution hours.
+- `completed_at` (DATETIME): Timestamp when task was marked COMPLETED.
+- `course_id` (BIGINT, FK -> courses.id): Linked subject course tag.
+- `user_id` (BIGINT, FK -> users.id): Task owner.
+
+TABLE 6: `subtasks`
+- `id` (BIGINT, PK, AUTO_INCREMENT): Subtask item identifier.
+- `title` (VARCHAR(200), NOT NULL): Checklist item text.
+- `completed` (BOOLEAN, NOT NULL): Checklist item completion status.
+- `task_id` (BIGINT, FK -> tasks.id): Parent task relationship.
+
+====================================================================================================
+3. AUTHENTICATION & AUTHORIZATION COMPLETE FLOW
+====================================================================================================
+
+The system implements a Hybrid JJWT Dual-Token + Stateful Active Session Architecture:
+
+STEP 1: USER LOGIN / REGISTRATION
+- User submits credentials (`email`, `password`) to `/api/auth/login`.
+- `AuthService` verifies credentials via `AuthenticationManager` and BCrypt.
+- `SessionManagementService` generates a unique `sessionId` and saves a `UserSession` entity.
+- `JwtUtils` signs a JJWT Access Token containing `subject` (email) and custom claim `sid` (sessionId).
+- `RefreshTokenService` creates a 7-day UUID Refresh Token.
+- Both tokens and `sessionId` are returned to React frontend and stored in localStorage.
+
+STEP 2: AUTHENTICATED REQUEST EXECUTION
+- React Axios interceptor attaches `Authorization: Bearer <accessToken>` and `X-Session-ID: <sessionId>`.
+- `JwtAuthenticationFilter` intercepts request:
+  1. Validates JJWT signature and expiration using secret key.
+  2. Extracts `email` and `sessionId` claims from token.
+  3. Queries `userSessionRepository.findBySessionId(sessionId)` in MySQL.
+  4. IF session exists AND `revoked == false`:
+     - Updates `last_active` timestamp (Session Heartbeat).
+     - Loads `UserDetails` and populates `SecurityContextHolder`.
+  5. IF session is revoked:
+     - Request is denied immediately with `401 Unauthorized` (enabling instant remote logout!).
+
+STEP 3: ACCESS TOKEN EXPIRATION & REFRESH ROTATION
+- When Access Token expires (15 min), backend returns `401 Unauthorized`.
+- React Axios response interceptor catches 401, extracts `refreshToken` from localStorage, and posts to `/api/auth/refresh-token`.
+- `AuthService` verifies refresh token in DB, generates a new Access Token, and retries original request seamlessly!
+
+====================================================================================================
+4. DUAL-LAYER VALIDATION MECHANISM
+====================================================================================================
+
+1. Backend Layer (Jakarta Bean Validation):
+   - DTOs use `@NotBlank`, `@NotNull`, `@Size`, `@Email`, `@FutureOrPresent` annotations.
+   - Controllers specify `@Valid` on request body payloads.
+   - `GlobalExceptionHandler` handles `MethodArgumentNotValidException`, compiling field-specific validation error maps into clean JSON responses.
+
+2. Frontend Layer (React Form Validation):
+   - Reactive input error state checking before dispatching HTTP requests.
+   - Real-time field feedback for email regex, minimum password lengths, and non-empty titles.
+
+====================================================================================================
+5. BACKEND JAVA CLASSES: ROLE, RATIONALE & EXECUTION LIFECYCLE
+====================================================================================================
+
+1. `StudentTaskApplication.java`
+   - Purpose: Main entry point for Spring Boot application (`@SpringBootApplication`).
+   - Invocation: Triggered by Java JVM on startup to initialize Spring context.
+
+2. Domain Entities (`User`, `RefreshToken`, `UserSession`, `Course`, `Task`, `Subtask`)
+   - Purpose: JPA Mapped Entities defining relational table schema and Hibernate ORM mappings.
+   - Invocation: Managed by JPA EntityManager during database operations.
+
+3. Enums (`Role`, `AuthProvider`, `Priority`, `TaskStatus`, `Category`)
+   - Purpose: Strongly typed enumeration constants for business domains.
+
+4. Data Transfer Objects (DTOs)
+   - `AuthRequest`, `RegisterRequest`, `AuthResponse`, `RefreshTokenRequest`, `TokenRefreshResponse`, `UserDto`, `UserSessionDto`, `TaskRequest`, `TaskResponse`, `CourseRequest`, `CourseResponse`, `DashboardStatsDto`, `ErrorDetails`.
+   - Purpose: Decouple API contract from database entities. Prevents over-posting vulnerabilities.
+
+5. Mappers (`UserMapper`, `TaskMapper`, `CourseMapper`, `SubtaskMapper`, `SessionMapper`)
+   - Purpose: Utility components converting domain entities to DTO responses.
+
+6. Repositories (`UserRepository`, `RefreshTokenRepository`, `UserSessionRepository`, `CourseRepository`, `TaskRepository`, `SubtaskRepository`)
+   - Purpose: Spring Data JPA interfaces providing type-safe database queries.
+
+7. Security Components:
+   - `JwtUtils.java`: JJWT token generation, parsing claims, and cryptographic signature validation.
+   - `JwtAuthenticationFilter.java`: Filter executed per HTTP request to extract Bearer token and check session revocation.
+   - `CustomUserDetails.java` & `UserDetailsServiceImpl.java`: Adapter connecting User entity to Spring Security.
+   - `SecurityConfig.java`: Configures SecurityFilterChain, CORS policy, stateless session policy, and BCrypt encoder.
+
+8. Services:
+   - `AuthService.java`: Registration, authentication, token issuing, OAuth2 handling.
+   - `SessionManagementService.java`: Active device session creation, heartbeat tracking, session revocation.
+   - `RefreshTokenService.java`: Refresh token lifecycle and rotation.
+   - `TaskService.java`: Task CRUD operations, status updates, filtering, CSV export generation.
+   - `CourseService.java`: Course tag management.
+   - `AnalyticsService.java`: Aggregates task stats, completion rates, and productivity scores.
+
+9. Controllers & Exception Handler:
+   - `AuthController.java`: Authentication endpoints (`/api/auth/*`).
+   - `TaskController.java`: Task management & CSV export endpoints (`/api/tasks/*`).
+   - `CourseController.java`: Course endpoints (`/api/courses/*`).
+   - `AnalyticsController.java`: Analytics dashboard endpoint (`/api/analytics/dashboard`).
+   - `GlobalExceptionHandler.java`: Intercepts exceptions across controllers and returns formatted error responses.
+
+====================================================================================================
+6. FRONTEND REACT COMPONENTS: ROLE & COMPONENT HIERARCHY
+====================================================================================================
+
+Hierarchy:
+`main.jsx` -> `AuthProvider` -> `App.jsx` -> [`Login` / `Register`] OR [`Navbar`, `Sidebar`, Active View (`Dashboard` | `TaskKanban` | `TaskList` | `CourseManager` | `SessionManager` | `PomodoroTimer`), `TaskModal`]
+
+Component Roles:
+1. `api.js`: Axios HTTP client with Bearer token injection and automatic 401 refresh token interceptor.
+2. `AuthContext.jsx`: React Context storing authenticated user state, active session ID, login, and logout routines.
+3. `Navbar.jsx`: Search bar, quick 'New Task' button, user profile dropdown, and sign out trigger.
+4. `Sidebar.jsx`: Main navigation bar to switch between views.
+5. `Dashboard.jsx`: Analytics metrics cards, category completion progress bars, and productivity index score.
+6. `TaskKanban.jsx`: Interactive status columns (To Do, In Progress, Completed) with drag/move controls.
+7. `TaskList.jsx`: Tabular task view with multi-filter controls and CSV export button.
+8. `TaskModal.jsx`: Modal dialog for creating/editing tasks with dynamic subtask checklist builder.
+9. `CourseManager.jsx`: Course tag creator with color presets and course list cards.
+10. `SessionManager.jsx`: Active login devices tracker displaying device metadata, IP address, and remote session revocation buttons.
+11. `PomodoroTimer.jsx`: Study focus timer with customizable work/break intervals and completion confetti.
+
+====================================================================================================
+7. DEPLOYMENT CONFIGURATION (RENDER + VERCEL)
+====================================================================================================
+
+- Backend (Render): Configured via `backend/Dockerfile` multi-stage build using Maven 3.9 + Java 21 JDK, outputting executable JAR. Listens on `${PORT}`.
+- Frontend (Vercel): Configured via `frontend/vercel.json` rewrite rules routing all client paths to `/index.html` for smooth React SPA navigation.
+====================================================================================================
