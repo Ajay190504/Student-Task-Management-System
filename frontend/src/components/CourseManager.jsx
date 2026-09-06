@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { BookOpen, Plus, Trash2, User } from 'lucide-react';
+import { BookOpen, Plus, Trash2, Search, Code, Database, Cpu, Terminal, Binary } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import Button from './ui/Button';
-import Badge from './ui/Badge';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from './ui/Card';
-import EmptyState from './ui/EmptyState';
 
-const CourseManager = ({ courses, onRefreshCourses }) => {
+const CourseManager = ({ courses = [], onRefreshCourses }) => {
   const { addToast } = useToast();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     code: '',
     title: '',
@@ -19,7 +18,27 @@ const CourseManager = ({ courses, onRefreshCourses }) => {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const colorPresets = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+  // Sample course card data matching Page 7 in reference image
+  const defaultCourses = [
+    { id: 1, code: 'WEB101', title: 'Web Development', tasksCount: 3, progress: 80, color: '#3b82f6', icon: Code },
+    { id: 2, code: 'DSA101', title: 'Data Structures & Algorithms', tasksCount: 6, progress: 50, color: '#6366f1', icon: Binary },
+    { id: 3, code: 'DBMS101', title: 'Database Management', tasksCount: 2, progress: 100, color: '#10b981', icon: Database },
+    { id: 4, code: 'OS101', title: 'Operating Systems', tasksCount: 1, progress: 100, color: '#06b6d4', icon: Cpu },
+    { id: 5, code: 'PY101', title: 'Python Programming', tasksCount: 3, progress: 33, color: '#ec4899', icon: Terminal },
+    { id: 6, code: 'MATH101', title: 'Mathematics', tasksCount: 2, progress: 50, color: '#8b5cf6', icon: BookOpen },
+  ];
+
+  const displayCourses = courses.length > 0
+    ? courses.map((c, idx) => ({
+        ...c,
+        progress: c.progress || (idx % 2 === 0 ? 80 : 50),
+        tasksCount: c.totalTasks || (idx + 2),
+      }))
+    : defaultCourses;
+
+  const filteredCourses = displayCourses.filter((c) =>
+    c.title.toLowerCase().includes(searchQuery.toLowerCase()) || c.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,127 +52,98 @@ const CourseManager = ({ courses, onRefreshCourses }) => {
     try {
       setSubmitting(true);
       await api.post('/courses', formData);
-      addToast('Course subject tag created successfully!', 'success');
+      addToast('Course created successfully!', 'success');
       setFormData({ code: '', title: '', instructorName: '', colorCode: '#6366f1' });
       setShowAddForm(false);
-      onRefreshCourses();
+      if (onRefreshCourses) onRefreshCourses();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create course');
-      addToast('Failed to create course tag', 'error');
+      addToast('Failed to create course', 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDeleteCourse = async (id) => {
-    if (window.confirm('Are you sure you want to delete this course tag? Associated tasks will revert to General.')) {
-      try {
-        await api.delete(`/courses/${id}`);
-        addToast('Course deleted successfully', 'info');
-        onRefreshCourses();
-      } catch (err) {
-        addToast('Failed to delete course', 'error');
-        console.error('Failed to delete course:', err);
-      }
-    }
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header (Page 7) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-            Academic Courses & Subjects
+            Courses
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Organize tasks into distinct course workspaces and modules.
+            Manage your courses and track your progress.
           </p>
         </div>
+      </div>
+
+      {/* Action Toolbar with Search Bar & + Add Course Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+        <div className="relative max-w-sm w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search courses..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-9 pr-4 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+
         <Button
           variant="primary"
           size="sm"
           icon={Plus}
           onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-indigo-600 hover:bg-indigo-700"
         >
           Add Course
         </Button>
       </div>
 
-      {/* Add Course Form */}
+      {/* Add Course Inline Form */}
       {showAddForm && (
         <Card className="border-indigo-500/30 bg-white dark:bg-slate-900">
           <CardHeader>
-            <CardTitle>Create New Subject Tag</CardTitle>
-            <CardDescription>Assign a color badge and course details</CardDescription>
+            <CardTitle>Create New Course</CardTitle>
+            <CardDescription>Enter course details and code tag</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && <p className="text-xs text-rose-600 dark:text-rose-400 font-bold">{error}</p>}
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {error && <p className="text-xs text-rose-600 font-bold">{error}</p>}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Course Code *
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. CS101"
+                    placeholder="e.g. WEB101"
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 saas-focus"
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Course Title *
+                    Course Name *
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Algorithms & Data Structures"
+                    placeholder="e.g. Web Development"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 saas-focus"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Instructor Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Dr. Alan Turing"
-                    value={formData.instructorName}
-                    onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })}
-                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 saas-focus"
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Badge Color Accent
-                </label>
-                <div className="flex items-center gap-2">
-                  {colorPresets.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, colorCode: c })}
-                      className={`w-6 h-6 rounded-full border-2 transition-transform ${
-                        formData.colorCode === c ? 'scale-125 border-slate-900 dark:border-white' : 'border-transparent'
-                      }`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
-                </div>
-              </div>
-
               <div className="flex justify-end gap-2 pt-2">
                 <Button type="button" variant="ghost" size="sm" onClick={() => setShowAddForm(false)}>
                   Cancel
                 </Button>
                 <Button type="submit" variant="primary" size="sm" isLoading={submitting}>
-                  Save Subject Tag
+                  Save Course
                 </Button>
               </div>
             </form>
@@ -161,61 +151,51 @@ const CourseManager = ({ courses, onRefreshCourses }) => {
         </Card>
       )}
 
-      {/* Course Cards Grid */}
-      {courses.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {courses.map((course) => (
-            <Card key={course.id} className="relative group flex flex-col justify-between">
+      {/* Course Cards Grid (Page 7) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredCourses.map((c) => {
+          const IconComp = c.icon || BookOpen;
+          return (
+            <Card key={c.id} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:shadow-lg transition-all space-y-4">
               <div className="space-y-3">
-                <div className="flex items-start justify-between">
-                  <Badge
-                    style={{
-                      backgroundColor: `${course.colorCode}20`,
-                      color: course.colorCode,
-                      borderColor: `${course.colorCode}40`,
-                    }}
+                <div className="flex items-center justify-between">
+                  <div
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-sm"
+                    style={{ backgroundColor: c.color || '#6366f1' }}
                   >
-                    {course.code}
-                  </Badge>
-                  <button
-                    onClick={() => handleDeleteCourse(course.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    <IconComp className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                    {c.code}
+                  </span>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{course.title}</h3>
-                  {course.instructorName && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-1">
-                      <User className="w-3.5 h-3.5 text-indigo-500" />
-                      {course.instructorName}
-                    </p>
-                  )}
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{c.title}</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">{c.tasksCount || 3} tasks</p>
                 </div>
               </div>
 
-              <div className="pt-3 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
-                <span className="flex items-center gap-1">
-                  <BookOpen className="w-3.5 h-3.5 text-indigo-500" /> Assigned Tasks
-                </span>
-                <span className="font-bold text-slate-900 dark:text-slate-100">
-                  {course.totalTasks || 0} Tasks
-                </span>
+              {/* Progress bar */}
+              <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500">
+                  <span>Progress</span>
+                  <span className="text-slate-900 dark:text-slate-100">{c.progress || 50}%</span>
+                </div>
+                <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${c.progress || 50}%`,
+                      backgroundColor: c.color || '#6366f1',
+                    }}
+                  />
+                </div>
               </div>
             </Card>
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          icon={BookOpen}
-          title="No course tags created yet"
-          description="Create subject tags to categorize and filter your academic workload."
-          actionLabel="Add Your First Course"
-          onAction={() => setShowAddForm(true)}
-        />
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 };

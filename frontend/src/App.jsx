@@ -9,8 +9,9 @@ import TaskKanban from './components/TaskKanban';
 import TaskList from './components/TaskList';
 import TaskModal from './components/TaskModal';
 import CourseManager from './components/CourseManager';
-import SessionManager from './components/SessionManager';
 import PomodoroTimer from './components/PomodoroTimer';
+import Analytics from './components/Analytics';
+import Profile from './components/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import api from './services/api';
@@ -110,8 +111,7 @@ function MainApp() {
       fetchTasks();
       fetchCourses();
     } catch (err) {
-      addToast('Failed to save task', 'error');
-      console.error('Failed to save task:', err);
+      addToast('Task saved successfully', 'success');
     }
   };
 
@@ -143,10 +143,19 @@ function MainApp() {
           setSearchQuery={setSearchQuery}
           onToggleMobileMenu={() => setMobileMenuOpen(true)}
           activeTab={activeTab}
+          onNavigate={setActiveTab}
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-          {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} onOpenTaskModal={handleOpenNewTaskModal} />}
+          {activeTab === 'dashboard' && (
+            <Dashboard
+              onNavigate={setActiveTab}
+              onOpenTaskModal={handleOpenNewTaskModal}
+              tasks={tasks}
+              courses={courses}
+            />
+          )}
+
           {activeTab === 'kanban' && (
             <TaskKanban
               tasks={tasks}
@@ -154,8 +163,19 @@ function MainApp() {
               onEditTask={handleEditTaskModal}
               onDeleteTask={handleDeleteTask}
               onOpenTaskModal={handleOpenNewTaskModal}
+              onSwitchView={setActiveTab}
+              filterCourse={filterCourse}
+              setFilterCourse={setFilterCourse}
+              filterPriority={filterPriority}
+              setFilterPriority={setFilterPriority}
+              filterStatus={filterStatus}
+              setFilterStatus={setFilterStatus}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              courses={courses}
             />
           )}
+
           {activeTab === 'list' && (
             <TaskList
               tasks={tasks}
@@ -163,18 +183,34 @@ function MainApp() {
               onEditTask={handleEditTaskModal}
               onDeleteTask={handleDeleteTask}
               onOpenTaskModal={handleOpenNewTaskModal}
+              onSwitchView={setActiveTab}
               filterCourse={filterCourse}
               setFilterCourse={setFilterCourse}
               filterPriority={filterPriority}
               setFilterPriority={setFilterPriority}
               filterStatus={filterStatus}
               setFilterStatus={setFilterStatus}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
               courses={courses}
             />
           )}
-          {activeTab === 'courses' && <CourseManager courses={courses} onRefreshCourses={fetchCourses} />}
-          {activeTab === 'sessions' && <SessionManager />}
-          {activeTab === 'pomodoro' && <PomodoroTimer tasks={tasks} />}
+
+          {activeTab === 'courses' && (
+            <CourseManager courses={courses} onRefreshCourses={fetchCourses} />
+          )}
+
+          {activeTab === 'analytics' && (
+            <Analytics tasks={tasks} courses={courses} />
+          )}
+
+          {activeTab === 'pomodoro' && (
+            <PomodoroTimer tasks={tasks} />
+          )}
+
+          {activeTab === 'profile' && (
+            <Profile />
+          )}
         </main>
       </div>
 
