@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider, useToast } from './context/ToastContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -16,6 +18,7 @@ import confetti from 'canvas-confetti';
 
 function MainApp() {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [tasks, setTasks] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -26,6 +29,9 @@ function MainApp() {
 
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const fetchCourses = async () => {
     try {
@@ -68,9 +74,13 @@ function MainApp() {
       await api.patch(`/tasks/${taskId}/status?status=${newStatus}`);
       if (newStatus === 'COMPLETED') {
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+        addToast('Task marked as completed! 🎉', 'success');
+      } else {
+        addToast(`Task status updated to ${newStatus.replace('_', ' ')}`, 'info');
       }
       fetchTasks();
     } catch (err) {
+      addToast('Failed to update task status', 'error');
       console.error('Failed to update task status:', err);
     }
   };
@@ -79,8 +89,10 @@ function MainApp() {
     if (window.confirm('Are you sure you want to delete this task?')) {
       try {
         await api.delete(`/tasks/${taskId}`);
+        addToast('Task deleted successfully', 'info');
         fetchTasks();
       } catch (err) {
+        addToast('Failed to delete task', 'error');
         console.error('Failed to delete task:', err);
       }
     }
@@ -90,12 +102,15 @@ function MainApp() {
     try {
       if (taskData.id) {
         await api.put(`/tasks/${taskData.id}`, taskData);
+        addToast('Task updated successfully', 'success');
       } else {
         await api.post('/tasks', taskData);
+        addToast('New task created!', 'success');
       }
       fetchTasks();
       fetchCourses();
     } catch (err) {
+      addToast('Failed to save task', 'error');
       console.error('Failed to save task:', err);
     }
   };
@@ -111,18 +126,27 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Navbar
-        onOpenTaskModal={handleOpenNewTaskModal}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row">
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        collapsed={sidebarCollapsed}
+        setCollapsed={setSidebarCollapsed}
+        mobileOpen={mobileMenuOpen}
+        setMobileOpen={setMobileMenuOpen}
       />
 
-      <div className="flex flex-1">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Navbar
+          onOpenTaskModal={handleOpenNewTaskModal}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onToggleMobileMenu={() => setMobileMenuOpen(true)}
+          activeTab={activeTab}
+        />
 
-        <main className="flex-1 p-6 overflow-y-auto max-w-7xl mx-auto w-full">
-          {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+          {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} onOpenTaskModal={handleOpenNewTaskModal} />}
           {activeTab === 'kanban' && (
             <TaskKanban
               tasks={tasks}
@@ -138,6 +162,7 @@ function MainApp() {
               onUpdateStatus={handleUpdateStatus}
               onEditTask={handleEditTaskModal}
               onDeleteTask={handleDeleteTask}
+              onOpenTaskModal={handleOpenNewTaskModal}
               filterCourse={filterCourse}
               setFilterCourse={setFilterCourse}
               filterPriority={filterPriority}
@@ -164,9 +189,9 @@ function MainApp() {
   );
 }
 
-function App() {
+function AppContent() {
   const { user, loading } = useAuth();
-  const [authView, setAuthView] = useState('login'); // 'login' | 'register'
+  const [authView, setAuthView] = useState('login');
 
   if (loading) {
     return (
@@ -185,6 +210,16 @@ function App() {
   }
 
   return <MainApp />;
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </ThemeProvider>
+  );
 }
 
 export default App;
