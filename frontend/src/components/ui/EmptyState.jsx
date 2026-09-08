@@ -11,7 +11,7 @@ const EmptyState = ({
 }) => {
   return (
     <div className="text-center py-12 px-4 saas-card border-dashed border-2 border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center space-y-3">
-      <div className="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50">
+      <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
         <Icon className="w-6 h-6" />
       </div>
       <div className="max-w-xs space-y-1">

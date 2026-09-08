@@ -1,4 +1,4 @@
-/* CSS Theme System for Student Task Management System */
+/* CSS Theme System for TaskPulse Student Task Management System */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
@@ -6,21 +6,22 @@
   --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f1f5f9;
+  --bg-sidebar: #0b132b;
   --bg-elevated: #ffffff;
   
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1;
-  --border-focus: #6366f1;
+  --border-focus: #2563eb;
   
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-tertiary: #64748b;
   --text-muted: #94a3b8;
   
-  --accent-primary: #4f46e5;
-  --accent-primary-hover: #4338ca;
-  --accent-primary-subtle: rgba(79, 70, 229, 0.08);
-  --accent-primary-border: rgba(79, 70, 229, 0.2);
+  --accent-primary: #2563eb;
+  --accent-primary-hover: #1d4ed8;
+  --accent-primary-subtle: rgba(37, 99, 235, 0.08);
+  --accent-primary-border: rgba(37, 99, 235, 0.2);
   
   --status-success-bg: rgba(16, 185, 129, 0.1);
   --status-success-text: #059669;
@@ -34,16 +35,16 @@
   --status-error-text: #dc2626;
   --status-error-border: rgba(239, 68, 68, 0.25);
   
-  --status-info-bg: rgba(6, 182, 212, 0.1);
-  --status-info-text: #0891b2;
-  --status-info-border: rgba(6, 182, 212, 0.25);
+  --status-info-bg: rgba(37, 99, 235, 0.1);
+  --status-info-text: #2563eb;
+  --status-info-border: rgba(37, 99, 235, 0.25);
   
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
   
-  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg: rgba(255, 255, 255, 0.9);
   --glass-border: rgba(226, 232, 240, 0.8);
 }
 
@@ -52,21 +53,22 @@
   --bg-primary: #090d16;
   --bg-secondary: #0f172a;
   --bg-tertiary: #1e293b;
+  --bg-sidebar: #060a17;
   --bg-elevated: #1e293b;
   
-  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.15);
-  --border-focus: #818cf8;
+  --border-focus: #3b82f6;
   
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
   --text-tertiary: #94a3b8;
   --text-muted: #64748b;
   
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #4f46e5;
-  --accent-primary-subtle: rgba(99, 102, 241, 0.15);
-  --accent-primary-border: rgba(99, 102, 241, 0.3);
+  --accent-primary: #3b82f6;
+  --accent-primary-hover: #2563eb;
+  --accent-primary-subtle: rgba(59, 130, 246, 0.15);
+  --accent-primary-border: rgba(59, 130, 246, 0.3);
   
   --status-success-bg: rgba(16, 185, 129, 0.15);
   --status-success-text: #34d399;
@@ -80,15 +82,15 @@
   --status-error-text: #f87171;
   --status-error-border: rgba(239, 68, 68, 0.3);
   
-  --status-info-bg: rgba(6, 182, 212, 0.15);
-  --status-info-text: #22d3ee;
-  --status-info-border: rgba(6, 182, 212, 0.3);
+  --status-info-bg: rgba(59, 130, 246, 0.15);
+  --status-info-text: #60a5fa;
+  --status-info-border: rgba(59, 130, 246, 0.3);
   
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 25px 30px -5px rgba(0, 0, 0, 0.6);
   
-  --glass-bg: rgba(15, 23, 42, 0.75);
+  --glass-bg: rgba(15, 23, 42, 0.85);
   --glass-border: rgba(255, 255, 255, 0.08);
 }

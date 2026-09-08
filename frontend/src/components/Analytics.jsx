@@ -32,8 +32,8 @@ const Analytics = ({ tasks = [], courses = [] }) => {
 
   // Course Bar Chart Data (Web Dev, DSA, DBMS, OS, Python, Math)
   const courseData = [
-    { name: 'Web Dev', count: 5, color: '#3b82f6' },
-    { name: 'DSA', count: 4, color: '#6366f1' },
+    { name: 'Web Dev', count: 5, color: '#2563EB' },
+    { name: 'DSA', count: 4, color: '#3B82F6' },
     { name: 'DBMS', count: 3, color: '#10b981' },
     { name: 'OS', count: 2, color: '#f59e0b' },
     { name: 'Python', count: 3, color: '#ec4899' },
@@ -61,7 +61,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Analytics & Performance Insights
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -71,7 +71,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
 
         {/* Time range selector */}
         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold">
-          <Calendar className="w-4 h-4 text-indigo-500 ml-1" />
+          <Calendar className="w-4 h-4 text-blue-500 ml-1" />
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
@@ -86,7 +86,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
 
       {/* Metric Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="p-5 flex items-center justify-between bg-white dark:bg-slate-900">
+        <Card className="p-5 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
           <div>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Task Completion</p>
             <p className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-1 tracking-tight">
@@ -104,7 +104,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
           </div>
         </Card>
 
-        <Card className="p-5 flex items-center justify-between bg-white dark:bg-slate-900">
+        <Card className="p-5 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
           <div>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Study Sessions</p>
             <p className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-1 tracking-tight">
@@ -112,12 +112,12 @@ const Analytics = ({ tasks = [], courses = [] }) => {
             </p>
             <p className="text-[11px] text-slate-400 mt-2.5">3 Pomodoro focus sessions today</p>
           </div>
-          <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+          <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             <Clock className="w-6 h-6" />
           </div>
         </Card>
 
-        <Card className="p-5 flex items-center justify-between bg-white dark:bg-slate-900">
+        <Card className="p-5 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
           <div>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Study Time</p>
             <p className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-1 tracking-tight">
@@ -134,7 +134,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
       {/* Grid of 4 Charts / Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Donut Chart: Task Status */}
-        <Card className="bg-white dark:bg-slate-900">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle>Task Status Breakdown</CardTitle>
             <CardDescription>Current completion state of all active tasks</CardDescription>
@@ -144,7 +144,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 {/* Background Track */}
                 <circle cx="50" cy="50" r="38" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="12" fill="none" />
-                {/* Segment 1: Completed Green (42% = 100 dashoffset approx) */}
+                {/* Segment 1: Completed Green */}
                 <circle
                   cx="50"
                   cy="50"
@@ -155,18 +155,18 @@ const Analytics = ({ tasks = [], courses = [] }) => {
                   strokeDashoffset="138"
                   fill="none"
                 />
-                {/* Segment 2: In Progress Blue (33%) */}
+                {/* Segment 2: In Progress Electric Blue */}
                 <circle
                   cx="50"
                   cy="50"
                   r="38"
-                  className="stroke-indigo-500"
+                  className="stroke-blue-600"
                   strokeWidth="12"
                   strokeDashoffset="160"
                   strokeDasharray="78 160"
                   fill="none"
                 />
-                {/* Segment 3: Pending Yellow (25%) */}
+                {/* Segment 3: Pending Yellow */}
                 <circle
                   cx="50"
                   cy="50"
@@ -195,7 +195,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
 
               <div className="flex items-center justify-between text-xs font-semibold">
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-indigo-500 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-blue-600 inline-block" />
                   <span className="text-slate-700 dark:text-slate-300">In Progress</span>
                 </div>
                 <span className="text-slate-900 dark:text-slate-100 font-bold">{inProgressCount} (33%)</span>
@@ -213,7 +213,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
         </Card>
 
         {/* Bar Chart: Tasks by Course */}
-        <Card className="bg-white dark:bg-slate-900">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle>Tasks by Course</CardTitle>
             <CardDescription>Academic workload distribution across subjects</CardDescription>
@@ -224,7 +224,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
                 const heightPercent = Math.round((course.count / maxCourseCount) * 100);
                 return (
                   <div key={course.name} className="flex-1 flex flex-col items-center gap-2 group">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-indigo-500">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-blue-600">
                       {course.count}
                     </span>
                     <div className="w-full max-w-[32px] bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
@@ -247,10 +247,10 @@ const Analytics = ({ tasks = [], courses = [] }) => {
         </Card>
 
         {/* Line Chart: Productivity Trend */}
-        <Card className="bg-white dark:bg-slate-900">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-indigo-500" />
+              <TrendingUp className="w-4 h-4 text-blue-600" />
               Productivity Trend
             </CardTitle>
             <CardDescription>Daily study score index over the week</CardDescription>
@@ -260,8 +260,8 @@ const Analytics = ({ tasks = [], courses = [] }) => {
               <svg className="w-full h-full overflow-visible" viewBox="0 0 450 100" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="gradientTrend" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#2563EB" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 {/* Area background */}
@@ -273,7 +273,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
                 <path
                   d={pathD}
                   fill="none"
-                  stroke="#6366f1"
+                  stroke="#2563EB"
                   strokeWidth="3"
                   strokeLinecap="round"
                 />
@@ -284,7 +284,7 @@ const Analytics = ({ tasks = [], courses = [] }) => {
                     cx={20 + idx * 66}
                     cy={pt.y}
                     r="4"
-                    className="fill-indigo-600 dark:fill-indigo-400 stroke-white dark:stroke-slate-900"
+                    className="fill-blue-600 dark:fill-blue-400 stroke-white dark:stroke-slate-900"
                     strokeWidth="2"
                   />
                 ))}
@@ -301,11 +301,11 @@ const Analytics = ({ tasks = [], courses = [] }) => {
         </Card>
 
         {/* Table: Study Session History */}
-        <Card className="bg-white dark:bg-slate-900">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Study Session History</span>
-              <span className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold cursor-pointer hover:underline">
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold cursor-pointer hover:underline">
                 View all →
               </span>
             </CardTitle>

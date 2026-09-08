@@ -103,7 +103,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
             placeholder="Enter task title"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 saas-focus"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-600"
           />
           {errors.title && <p className="text-rose-600 dark:text-rose-400 text-[10px] font-bold mt-1">{errors.title}</p>}
         </div>
@@ -118,7 +118,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
             placeholder="Enter task description (optional)"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 saas-focus"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-600"
           ></textarea>
         </div>
 
@@ -131,7 +131,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
             <select
               value={formData.courseId}
               onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 saas-focus"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
             >
               <option value="">Select Course</option>
               {courses.map((course) => (
@@ -178,7 +178,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 saas-focus"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
             >
               <option value="TODO">To Do</option>
               <option value="IN_PROGRESS">In Progress</option>
@@ -195,7 +195,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 saas-focus"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
             />
           </div>
         </div>
@@ -211,7 +211,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
               placeholder="Add subtask item..."
               value={subtaskTitle}
               onChange={(e) => setSubtaskTitle(e.target.value)}
-              className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
             />
             <Button type="button" variant="secondary" size="sm" icon={Plus} onClick={handleAddSubtask}>
               Add Subtask
@@ -225,7 +225,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
                 className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/60 p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300"
               >
                 <span className="flex items-center gap-2 font-medium">
-                  <CheckSquare className="w-3.5 h-3.5 text-indigo-500" />
+                  <CheckSquare className="w-3.5 h-3.5 text-blue-600" />
                   {sub.title}
                 </span>
                 <button
@@ -245,7 +245,7 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="sm" isLoading={submitting} className="bg-indigo-600 hover:bg-indigo-700 px-4">
+          <Button type="submit" variant="primary" size="sm" isLoading={submitting} className="px-4">
             {initialTask ? 'Save Changes' : 'Create Task'}
           </Button>
         </div>

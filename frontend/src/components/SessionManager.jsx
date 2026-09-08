@@ -71,7 +71,7 @@ const SessionManager = () => {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 tracking-tight">
-            <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Security & Active Sessions
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -84,7 +84,7 @@ const SessionManager = () => {
         </Button>
       </div>
 
-      <Card className="p-0 overflow-hidden bg-white dark:bg-slate-900">
+      <Card className="p-0 overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs">
         <div className="divide-y divide-slate-100 dark:divide-slate-800">
           {sessions.map((sess) => (
             <div
@@ -92,7 +92,7 @@ const SessionManager = () => {
               className="p-4 flex items-center justify-between gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-indigo-600 dark:text-indigo-400">
+                <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-blue-600 dark:text-blue-400">
                   {sess.deviceInfo?.toLowerCase().includes('mobile') ? (
                     <Smartphone className="w-5 h-5" />
                   ) : (
