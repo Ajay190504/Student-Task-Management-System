@@ -1,96 +1,96 @@
-/* CSS Theme System for TaskPulse Student Task Management System */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+/* TaskPulse CSS Theme System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Color Tokens - Light Mode Default Variables */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
-  --bg-sidebar: #0b132b;
-  --bg-elevated: #ffffff;
+  /* Color Tokens - Light Mode (Default) */
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F1F5F9;
+  --bg-sidebar: #0F172A;
+  --bg-elevated: #FFFFFF;
   
-  --border-subtle: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --border-focus: #2563eb;
+  --border-subtle: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --border-focus: #2563EB;
   
-  --text-primary: #0f172a;
+  --text-primary: #0F172A;
   --text-secondary: #475569;
-  --text-tertiary: #64748b;
-  --text-muted: #94a3b8;
+  --text-tertiary: #64748B;
+  --text-muted: #94A3B8;
   
-  --accent-primary: #2563eb;
-  --accent-primary-hover: #1d4ed8;
+  --accent-primary: #2563EB;
+  --accent-primary-hover: #1D4ED8;
   --accent-primary-subtle: rgba(37, 99, 235, 0.08);
   --accent-primary-border: rgba(37, 99, 235, 0.2);
   
-  --status-success-bg: rgba(16, 185, 129, 0.1);
-  --status-success-text: #059669;
-  --status-success-border: rgba(16, 185, 129, 0.25);
+  --status-success: #16A34A;
+  --status-success-bg: rgba(22, 163, 74, 0.08);
+  --status-success-text: #15803D;
+  --status-success-border: rgba(22, 163, 74, 0.2);
   
-  --status-warning-bg: rgba(245, 158, 11, 0.1);
-  --status-warning-text: #d97706;
-  --status-warning-border: rgba(245, 158, 11, 0.25);
+  --status-warning: #D97706;
+  --status-warning-bg: rgba(217, 119, 6, 0.08);
+  --status-warning-text: #B45309;
+  --status-warning-border: rgba(217, 119, 6, 0.2);
   
-  --status-error-bg: rgba(239, 68, 68, 0.1);
-  --status-error-text: #dc2626;
-  --status-error-border: rgba(239, 68, 68, 0.25);
+  --status-danger: #DC2626;
+  --status-danger-bg: rgba(220, 38, 38, 0.08);
+  --status-danger-text: #B91C1C;
+  --status-danger-border: rgba(220, 38, 38, 0.2);
   
-  --status-info-bg: rgba(37, 99, 235, 0.1);
-  --status-info-text: #2563eb;
-  --status-info-border: rgba(37, 99, 235, 0.25);
+  --status-info: #2563EB;
+  --status-info-bg: rgba(37, 99, 235, 0.08);
+  --status-info-text: #1D4ED8;
+  --status-info-border: rgba(37, 99, 235, 0.2);
   
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
-  
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(226, 232, 240, 0.8);
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.06), 0 4px 6px -4px rgba(15, 23, 42, 0.02);
 }
 
 .dark {
-  /* Color Tokens - Dark Mode Overrides */
-  --bg-primary: #090d16;
-  --bg-secondary: #0f172a;
-  --bg-tertiary: #1e293b;
-  --bg-sidebar: #060a17;
-  --bg-elevated: #1e293b;
+  /* Color Tokens - Dark Mode */
+  --bg-primary: #0B0F19;
+  --bg-secondary: #0F172A;
+  --bg-tertiary: #1E293B;
+  --bg-sidebar: #090D16;
+  --bg-elevated: #1E293B;
   
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.15);
-  --border-focus: #3b82f6;
+  --border-subtle: #1E293B;
+  --border-strong: #334155;
+  --border-focus: #3B82F6;
   
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-tertiary: #94A3B8;
+  --text-muted: #64748B;
   
-  --accent-primary: #3b82f6;
-  --accent-primary-hover: #2563eb;
-  --accent-primary-subtle: rgba(59, 130, 246, 0.15);
-  --accent-primary-border: rgba(59, 130, 246, 0.3);
+  --accent-primary: #3B82F6;
+  --accent-primary-hover: #2563EB;
+  --accent-primary-subtle: rgba(59, 130, 246, 0.12);
+  --accent-primary-border: rgba(59, 130, 246, 0.25);
   
-  --status-success-bg: rgba(16, 185, 129, 0.15);
-  --status-success-text: #34d399;
-  --status-success-border: rgba(16, 185, 129, 0.3);
+  --status-success: #22C55E;
+  --status-success-bg: rgba(34, 197, 94, 0.12);
+  --status-success-text: #4ADE80;
+  --status-success-border: rgba(34, 197, 94, 0.25);
   
-  --status-warning-bg: rgba(245, 158, 11, 0.15);
-  --status-warning-text: #fbbf24;
-  --status-warning-border: rgba(245, 158, 11, 0.3);
+  --status-warning: #F59E0B;
+  --status-warning-bg: rgba(245, 158, 11, 0.12);
+  --status-warning-text: #FBBF24;
+  --status-warning-border: rgba(245, 158, 11, 0.25);
   
-  --status-error-bg: rgba(239, 68, 68, 0.15);
-  --status-error-text: #f87171;
-  --status-error-border: rgba(239, 68, 68, 0.3);
+  --status-danger: #EF4444;
+  --status-danger-bg: rgba(239, 68, 68, 0.12);
+  --status-danger-text: #F87171;
+  --status-danger-border: rgba(239, 68, 68, 0.25);
   
-  --status-info-bg: rgba(59, 130, 246, 0.15);
-  --status-info-text: #60a5fa;
-  --status-info-border: rgba(59, 130, 246, 0.3);
+  --status-info: #3B82F6;
+  --status-info-bg: rgba(59, 130, 246, 0.12);
+  --status-info-text: #60A5FA;
+  --status-info-border: rgba(59, 130, 246, 0.25);
   
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 25px 30px -5px rgba(0, 0, 0, 0.6);
-  
-  --glass-bg: rgba(15, 23, 42, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }

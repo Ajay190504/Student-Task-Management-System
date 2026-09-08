@@ -1,29 +1,31 @@
 import React from 'react';
-import { Inbox } from 'lucide-react';
 import Button from './Button';
 
 const EmptyState = ({
-  icon: Icon = Inbox,
-  title = 'No items found',
-  description = 'There are no items matching your criteria at this time.',
+  icon: Icon,
+  title,
+  description,
   actionLabel,
   onAction,
+  className = '',
 }) => {
   return (
-    <div className="text-center py-12 px-4 saas-card border-dashed border-2 border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center space-y-3">
-      <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
-        <Icon className="w-6 h-6" />
-      </div>
-      <div className="max-w-xs space-y-1">
-        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{title}</h4>
-        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{description}</p>
-      </div>
-      {actionLabel && onAction && (
-        <div className="pt-2">
-          <Button variant="primary" size="sm" onClick={onAction}>
-            {actionLabel}
-          </Button>
+    <div className={`flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-white dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 rounded-[14px] ${className}`}>
+      {Icon && (
+        <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
+          <Icon className="w-6 h-6" />
         </div>
+      )}
+      <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1 tracking-tight">{title}</h3>
+      {description && (
+        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
+          {description}
+        </p>
+      )}
+      {actionLabel && onAction && (
+        <Button variant="primary" onClick={onAction}>
+          {actionLabel}
+        </Button>
       )}
     </div>
   );

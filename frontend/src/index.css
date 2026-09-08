@@ -3,22 +3,25 @@
 @import "tailwindcss/utilities";
 @import "./styles/theme.css";
 
-body {
+/* Global Base Resets & Typography */
+html, body {
   margin: 0;
+  padding: 0;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border-strong);
@@ -28,40 +31,40 @@ body {
   background: var(--text-muted);
 }
 
-/* Reusable SaaS Card Utilities */
+/* Mandatory Global SaaS Control Resets - No Browser Default Controls */
+input, select, textarea {
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-subtle);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Reusable SaaS UI Classes */
 .saas-card {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: 1rem;
+  border-radius: 14px;
   box-shadow: var(--shadow-sm);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.saas-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-md);
-}
-
-/* Glassmorphism Panel */
-.saas-glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-}
-
-/* Custom Focus Ring */
 .saas-focus {
   outline: none;
 }
 .saas-focus:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
-}
-
-/* Linear Gradient Text Accent */
-.saas-gradient-text {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }

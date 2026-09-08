@@ -1,85 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, CheckSquare } from 'lucide-react';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
+import { Input, Select, Textarea } from './ui/Input';
 
-const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) => {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    priority: 'MEDIUM',
-    status: 'TODO',
-    category: 'ASSIGNMENT',
-    dueDate: '',
-    courseId: '',
-    subtasks: []
-  });
-
-  const [subtaskTitle, setSubtaskTitle] = useState('');
-  const [errors, setErrors] = useState({});
+const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask = null, courses = [] }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [courseId, setCourseId] = useState('');
+  const [priority, setPriority] = useState('MEDIUM');
+  const [status, setStatus] = useState('TODO');
+  const [dueDate, setDueDate] = useState('');
+  const [estimatedHours, setEstimatedHours] = useState('1');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialTask) {
-      setFormData({
-        id: initialTask.id,
-        title: initialTask.title || '',
-        description: initialTask.description || '',
-        priority: initialTask.priority || 'MEDIUM',
-        status: initialTask.status || 'TODO',
-        category: initialTask.category || 'ASSIGNMENT',
-        dueDate: initialTask.dueDate || '',
-        courseId: initialTask.course?.id || '',
-        subtasks: initialTask.subtasks ? [...initialTask.subtasks] : []
-      });
+      setTitle(initialTask.title || '');
+      setDescription(initialTask.description || '');
+      setCourseId(initialTask.courseId || initialTask.course?.id || '');
+      setPriority(initialTask.priority || 'MEDIUM');
+      setStatus(initialTask.status || 'TODO');
+      setDueDate(initialTask.dueDate ? new Date(initialTask.dueDate).toISOString().split('T')[0] : '');
+      setEstimatedHours(initialTask.estimatedHours || '1');
     } else {
-      setFormData({
-        title: '',
-        description: '',
-        priority: 'MEDIUM',
-        status: 'TODO',
-        category: 'ASSIGNMENT',
-        dueDate: '',
-        courseId: '',
-        subtasks: []
-      });
+      setTitle('');
+      setDescription('');
+      setCourseId(courses[0]?.id || '');
+      setPriority('MEDIUM');
+      setStatus('TODO');
+      setDueDate('');
+      setEstimatedHours('1');
     }
-    setErrors({});
-    setSubmitting(false);
-  }, [initialTask, isOpen]);
-
-  const handleAddSubtask = () => {
-    if (!subtaskTitle.trim()) return;
-    setFormData((prev) => ({
-      ...prev,
-      subtasks: [...prev.subtasks, { title: subtaskTitle.trim(), completed: false }]
-    }));
-    setSubtaskTitle('');
-  };
-
-  const handleRemoveSubtask = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      subtasks: prev.subtasks.filter((_, i) => i !== index)
-    }));
-  };
+  }, [initialTask, isOpen, courses]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = 'Task title is required';
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    if (!title.trim()) return;
 
     try {
       setSubmitting(true);
-      await onSaveTask(formData);
+      await onSaveTask({
+        id: initialTask?.id,
+        title,
+        description,
+        courseId: courseId ? Number(courseId) : undefined,
+        priority,
+        status,
+        dueDate: dueDate || undefined,
+        estimatedHours: Number(estimatedHours) || 1,
+      });
       onClose();
     } catch (err) {
-      console.error('Failed to submit task:', err);
+      console.error('Failed to save task:', err);
     } finally {
       setSubmitting(false);
     }
@@ -89,163 +61,85 @@ const TaskModal = ({ isOpen, onClose, onSaveTask, initialTask, courses = [] }) =
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialTask ? 'Edit Task' : 'Create New Task'}
+      title={initialTask ? 'Edit Task' : 'Create Task'}
       maxWidth="max-w-xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-4 max-h-[78vh] overflow-y-auto pr-1">
-        {/* Task Title * */}
-        <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-            Task Title *
-          </label>
-          <input
-            type="text"
-            placeholder="Enter task title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-600"
-          />
-          {errors.title && <p className="text-rose-600 dark:text-rose-400 text-[10px] font-bold mt-1">{errors.title}</p>}
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Task Title *"
+          placeholder="e.g. Complete React Assignment 3"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
 
-        {/* Description */}
-        <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-            Description
-          </label>
-          <textarea
-            rows="3"
-            placeholder="Enter task description (optional)"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-600"
-          ></textarea>
-        </div>
+        <Textarea
+          label="Description"
+          placeholder="Add assignment guidelines, key requirements, or notes..."
+          rows={3}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-        {/* Course * & Priority * (Page 6 layout) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Course *
-            </label>
-            <select
-              value={formData.courseId}
-              onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
-            >
-              <option value="">Select Course</option>
-              {courses.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.code} - {course.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Priority *
-            </label>
-            <div className="flex items-center gap-2">
-              {['LOW', 'MEDIUM', 'HIGH'].map((prio) => (
-                <button
-                  key={prio}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, priority: prio })}
-                  className={`flex-1 py-1.5 text-[11px] font-bold rounded-xl border transition-all ${
-                    formData.priority === prio
-                      ? prio === 'HIGH'
-                        ? 'bg-rose-500/10 text-rose-600 border-rose-500/30'
-                        : prio === 'MEDIUM'
-                        ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
-                        : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30'
-                      : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500'
-                  }`}
-                >
-                  {prio.charAt(0) + prio.slice(1).toLowerCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Status & Due Date */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Status
-            </label>
-            <select
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
-            >
-              <option value="TODO">To Do</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="OVERDUE">Overdue</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Due Date *
-            </label>
-            <input
-              type="date"
-              value={formData.dueDate}
-              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
-            />
-          </div>
-        </div>
-
-        {/* Subtasks (optional) */}
-        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-            Subtasks (optional)
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Add subtask item..."
-              value={subtaskTitle}
-              onChange={(e) => setSubtaskTitle(e.target.value)}
-              className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
-            />
-            <Button type="button" variant="secondary" size="sm" icon={Plus} onClick={handleAddSubtask}>
-              Add Subtask
-            </Button>
-          </div>
-
-          <div className="space-y-1.5 mt-2 max-h-32 overflow-y-auto">
-            {formData.subtasks.map((sub, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/60 p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300"
-              >
-                <span className="flex items-center gap-2 font-medium">
-                  <CheckSquare className="w-3.5 h-3.5 text-blue-600" />
-                  {sub.title}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSubtask(idx)}
-                  className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Select
+            label="Course"
+            value={courseId}
+            onChange={(e) => setCourseId(e.target.value)}
+          >
+            <option value="">Select Course</option>
+            {courses.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.code})
+              </option>
             ))}
-          </div>
+          </Select>
+
+          <Select
+            label="Priority"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+          >
+            <option value="HIGH">High Priority</option>
+            <option value="MEDIUM">Medium Priority</option>
+            <option value="LOW">Low Priority</option>
+          </Select>
         </div>
 
-        {/* Modal Footer Actions */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Select
+            label="Status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="TODO">To Do</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="REVIEW">Review</option>
+            <option value="COMPLETED">Completed</option>
+          </Select>
+
+          <Input
+            label="Due Date"
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
+        </div>
+
+        <Input
+          label="Estimated Hours"
+          type="number"
+          min="0.5"
+          step="0.5"
+          value={estimatedHours}
+          onChange={(e) => setEstimatedHours(e.target.value)}
+        />
+
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose} disabled={submitting}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="sm" isLoading={submitting} className="px-4">
+          <Button type="submit" variant="primary" isLoading={submitting}>
             {initialTask ? 'Save Changes' : 'Create Task'}
           </Button>
         </div>
